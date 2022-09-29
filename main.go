@@ -1,17 +1,13 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"net/url"
-	"os"
 
-	"github.com/DecentralCardGame/Cardchain/x/cardchain/types"
-	sdktypes "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ignite-hq/cli/ignite/pkg/cosmosclient"
+	"github.com/DecentralCardGame/go-faucet/cardchain"
+	"github.com/DecentralCardGame/go-faucet/token"
 	"github.com/joho/godotenv"
 )
 
@@ -22,97 +18,6 @@ var (
 type Payload struct {
 	Token   string
 	Address string
-}
-
-type CaptchaResponse struct {
-	Success     bool
-	Credit      bool
-	Hostname    string
-	ChallengeTs string `json:"challenge_ts"`
-}
-
-func getClient() (cosmosclient.Client, error) {
-	config := sdktypes.GetConfig()
-	config.SetBech32PrefixForAccount("cc", "ccpub")
-
-	return cosmosclient.New(context.Background(), cosmosclient.WithAddressPrefix("cc"), cosmosclient.WithNodeAddress(os.Getenv("RPC_NODE")))
-}
-
-func getAddr(cosmos cosmosclient.Client, user string) (sdktypes.AccAddress, error) {
-	address, err := cosmos.Address(user)
-	if err != nil {
-		return nil, err
-	}
-	return address, nil
-}
-
-func broadcastMsg(cosmos cosmosclient.Client, creator string, msg sdktypes.Msg) error {
-	resp, err := cosmos.BroadcastTx(creator, msg)
-	if err != nil {
-		return err
-	}
-
-	log.Printf("%d", int(resp.Code))
-
-	return nil
-}
-
-func createUser(creator string, alias string, userAddressString string) error {
-	cosmos, err := getClient()
-	if err != nil {
-		return err
-	}
-
-	address, err := getAddr(cosmos, creator)
-	if err != nil {
-		return err
-	}
-
-	userAddr, err := sdktypes.AccAddressFromBech32(userAddressString)
-	if err != nil {
-		return err
-	}
-
-	msg := types.NewMsgCreateuser(
-		address.String(),
-		userAddr.String(),
-		alias,
-	)
-
-	err = broadcastMsg(cosmos, creator, msg)
-
-	return err
-}
-
-func isValidToken(token string) (bool, error) {
-	data := url.Values{
-		"secret":   {os.Getenv("SECRET_KEY")},
-		"response": {token},
-	}
-
-	resp, err := http.PostForm(
-		"https://hcaptcha.com/siteverify",
-		data,
-	)
-	if err != nil {
-		return false, err
-	}
-
-	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return false, err
-	}
-
-	captchaResponse := CaptchaResponse{}
-	err = json.Unmarshal(body, &captchaResponse)
-	if err != nil {
-		return false, err
-	}
-
-	log.Printf("%#v", captchaResponse)
-
-	return captchaResponse.Success, nil
 }
 
 func handleClaimTokens(w http.ResponseWriter, r *http.Request) {
@@ -133,7 +38,7 @@ func handleClaimTokens(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	isValid, err := isValidToken(payload.Token)
+	isValid, err := token.ValidateToken(payload.Token)
 	if err != nil {
 		panic(err)
 	}
@@ -142,7 +47,7 @@ func handleClaimTokens(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = createUser(CHAIN_USER, "newUser", payload.Address)
+	err = cardchain.CreateUser(CHAIN_USER, "newUser", payload.Address)
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -9,6 +9,7 @@ import (
 
 	"github.com/DecentralCardGame/go-faucet/cardchain"
 	"github.com/DecentralCardGame/go-faucet/token"
+	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/joho/godotenv"
 )
 
@@ -19,6 +20,20 @@ var (
 type Payload struct {
 	Token   string
 	Address string
+	Alias   string
+}
+
+func (p Payload) verify(w http.ResponseWriter) bool {
+	_, err := sdktypes.AccAddressFromBech32(p.Address)
+
+	if p.Token == "" {
+		http.Error(w, "Field token is empty", http.StatusBadRequest)
+		return false
+	} else if err != nil {
+		http.Error(w, fmt.Sprintf("Address is invalid: %s", err.Error()), http.StatusBadRequest)
+		return false
+	}
+	return true
 }
 
 func handleClaimTokens(w http.ResponseWriter, r *http.Request) {
@@ -36,7 +51,15 @@ func handleClaimTokens(w http.ResponseWriter, r *http.Request) {
 
 	err = json.Unmarshal(body, &payload)
 	if err != nil {
-		handleInternalServerError(w, err)
+		http.Error(
+			w,
+			"Invalid json",
+			http.StatusBadRequest,
+		)
+		return
+	}
+
+	if !payload.verify(w) {
 		return
 	}
 
@@ -55,7 +78,7 @@ func handleClaimTokens(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cResp, err := cardchain.CreateUser(CHAIN_USER, "newUser", payload.Address)
+	cResp, err := cardchain.CreateUser(CHAIN_USER, payload.Alias, payload.Address)
 	if err != nil {
 		handleInternalServerError(w, err)
 		return
@@ -64,7 +87,11 @@ func handleClaimTokens(w http.ResponseWriter, r *http.Request) {
 	if cResp.Code != 0 {
 		http.Error(
 			w,
-			fmt.Sprintf("Cardchain responded with code %d: %s", cResp.Code, cResp.RawLog),
+			fmt.Sprintf(
+				"Cardchain responded with code %d: %s",
+				cResp.Code,
+				cResp.RawLog,
+			),
 			http.StatusForbidden,
 		)
 	}
@@ -88,6 +115,7 @@ func enableCors(w *http.ResponseWriter) {
 }
 
 func main() {
+	cardchain.SetConfig()
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatalf("Some error occured. Err: %s", err)

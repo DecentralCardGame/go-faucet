@@ -8,10 +8,12 @@ import (
 	"github.com/ignite-hq/cli/ignite/pkg/cosmosclient"
 )
 
-func getClient() (cosmosclient.Client, error) {
+func SetConfig() {
 	config := sdktypes.GetConfig()
 	config.SetBech32PrefixForAccount("cc", "ccpub")
+}
 
+func getClient() (cosmosclient.Client, error) {
 	return cosmosclient.New(
 		context.Background(),
 		cosmosclient.WithAddressPrefix("cc"),

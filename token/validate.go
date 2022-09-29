@@ -3,7 +3,6 @@ package token
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -41,8 +40,6 @@ func ValidateToken(token string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-
-	log.Printf("%#v", cResp)
 
 	return cResp.Success, nil
 }

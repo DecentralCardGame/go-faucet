@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -29,28 +30,49 @@ func handleClaimTokens(w http.ResponseWriter, r *http.Request) {
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		panic(err)
+		handleInternalServerError(w, err)
+		return
 	}
-	log.Print(r.Header.Get("Content-Type"))
-	log.Print(string(body))
+
 	err = json.Unmarshal(body, &payload)
 	if err != nil {
-		panic(err)
+		handleInternalServerError(w, err)
+		return
 	}
 
 	isValid, err := token.ValidateToken(payload.Token)
 	if err != nil {
-		panic(err)
-	}
-
-	if !isValid {
+		handleInternalServerError(w, err)
 		return
 	}
 
-	err = cardchain.CreateUser(CHAIN_USER, "newUser", payload.Address)
-	if err != nil {
-		log.Fatal(err)
+	if !isValid {
+		http.Error(
+			w,
+			"User failed captcha",
+			http.StatusForbidden,
+		)
+		return
 	}
+
+	cResp, err := cardchain.CreateUser(CHAIN_USER, "newUser", payload.Address)
+	if err != nil {
+		handleInternalServerError(w, err)
+		return
+	}
+
+	if cResp.Code != 0 {
+		http.Error(
+			w,
+			fmt.Sprintf("Cardchain responded with code %d: %s", cResp.Code, cResp.RawLog),
+			http.StatusForbidden,
+		)
+	}
+}
+
+func handleInternalServerError(w http.ResponseWriter, err error) {
+	http.Error(w, "Internal server error", http.StatusInternalServerError)
+	log.Printf("Error: %s", err.Error())
 }
 
 func handleRequests() {

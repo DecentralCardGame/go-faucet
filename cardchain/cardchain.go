@@ -2,7 +2,6 @@ package cardchain
 
 import (
 	"context"
-	"log"
 	"os"
 
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
@@ -28,13 +27,15 @@ func getAddr(cosmos cosmosclient.Client, user string) (sdktypes.AccAddress, erro
 	return address, nil
 }
 
-func broadcastMsg(cosmos cosmosclient.Client, creator string, msg sdktypes.Msg) error {
+func broadcastMsg(
+	cosmos cosmosclient.Client,
+	creator string,
+	msg sdktypes.Msg,
+) (*cosmosclient.Response, error) {
 	resp, err := cosmos.BroadcastTx(creator, msg)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	log.Printf("%d", int(resp.Code))
-
-	return nil
+	return &resp, nil
 }

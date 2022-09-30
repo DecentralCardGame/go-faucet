@@ -9,6 +9,7 @@ go build
 ```
 
 ## Configuration
+Example `.env`
 ```shell
 SECRET_KEY=key  # The key used to communicate with the hCaptcha server
 RPC_NODE=tcp://127.0.0.1:26657  # Blockchains rpc node

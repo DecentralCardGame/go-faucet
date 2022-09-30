@@ -6,50 +6,29 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/DecentralCardGame/go-faucet/cardchain"
+	"github.com/DecentralCardGame/go-faucet/payload"
 	"github.com/DecentralCardGame/go-faucet/token"
-	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/joho/godotenv"
 )
-
-var (
-	CHAIN_USER string = "alice"
-)
-
-type Payload struct {
-	Token   string
-	Address string
-	Alias   string
-}
-
-func (p Payload) verify(w http.ResponseWriter) bool {
-	_, err := sdktypes.AccAddressFromBech32(p.Address)
-
-	if p.Token == "" {
-		http.Error(w, "Field token is empty", http.StatusBadRequest)
-		return false
-	} else if err != nil {
-		http.Error(w, fmt.Sprintf("Address is invalid: %s", err.Error()), http.StatusBadRequest)
-		return false
-	}
-	return true
-}
 
 func handleClaimTokens(w http.ResponseWriter, r *http.Request) {
 	log.Print("Endpoint Hit: ClaimTokens")
 	w.Header().Set("Content-Type", "application/json")
 	enableCors(&w)
 
-	payload := Payload{}
+	pl := payload.Payload{}
 
+	defer r.Body.Close()
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		handleInternalServerError(w, err)
 		return
 	}
 
-	err = json.Unmarshal(body, &payload)
+	err = json.Unmarshal(body, &pl)
 	if err != nil {
 		http.Error(
 			w,
@@ -59,11 +38,11 @@ func handleClaimTokens(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !payload.verify(w) {
+	if !pl.Verify(w) {
 		return
 	}
 
-	isValid, err := token.ValidateToken(payload.Token)
+	isValid, err := token.ValidateToken(pl.Token)
 	if err != nil {
 		handleInternalServerError(w, err)
 		return
@@ -78,7 +57,11 @@ func handleClaimTokens(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cResp, err := cardchain.CreateUser(CHAIN_USER, payload.Alias, payload.Address)
+	cResp, err := cardchain.CreateUser(
+		os.Getenv("BLOCKCHAIN_USER"),
+		pl.Alias,
+		pl.Address,
+	)
 	if err != nil {
 		handleInternalServerError(w, err)
 		return

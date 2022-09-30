@@ -12,7 +12,7 @@ func CreateUser(creator string, alias string, userAddressString string) (*cosmos
 		return nil, err
 	}
 
-	address, err := getAddr(cosmos, creator)
+	address, err := cosmos.Address(creator)
 	if err != nil {
 		return nil, err
 	}

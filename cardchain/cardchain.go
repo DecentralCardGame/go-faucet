@@ -21,14 +21,6 @@ func getClient() (cosmosclient.Client, error) {
 	)
 }
 
-func getAddr(cosmos cosmosclient.Client, user string) (sdktypes.AccAddress, error) {
-	address, err := cosmos.Address(user)
-	if err != nil {
-		return nil, err
-	}
-	return address, nil
-}
-
 func broadcastMsg(
 	cosmos cosmosclient.Client,
 	creator string,

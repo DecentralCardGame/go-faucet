@@ -2,6 +2,7 @@ package token
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -12,7 +13,8 @@ type captchaResponse struct {
 	Success     bool
 	Credit      bool
 	Hostname    string
-	ChallengeTs string `json:"challenge_ts"`
+	ChallengeTs string   `json:"challenge_ts"`
+	ErrorCodes  []string `json:"error-codes"`
 }
 
 func ValidateToken(token string) (bool, error) {
@@ -39,6 +41,10 @@ func ValidateToken(token string) (bool, error) {
 	err = json.Unmarshal(body, &cResp)
 	if err != nil {
 		return false, err
+	}
+
+	if len(cResp.ErrorCodes) > 0 {
+		return false, fmt.Errorf("Captcha responded with errors: %s", cResp.ErrorCodes)
 	}
 
 	return cResp.Success, nil

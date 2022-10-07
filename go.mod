@@ -2,12 +2,12 @@ module github.com/DecentralCardGame/go-faucet
 
 go 1.18
 
-replace github.com/DecentralCardGame/Cardchain => ../Cardchain
+//replace github.com/DecentralCardGame/Cardchain => ../Cardchain
 
 replace github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 
 require (
-	github.com/DecentralCardGame/Cardchain v0.0.0-00010101000000-000000000000
+	github.com/DecentralCardGame/Cardchain v0.1.1
 	github.com/cosmos/cosmos-sdk v0.45.3
 	github.com/ignite-hq/cli v0.20.4
 	github.com/joho/godotenv v1.3.0

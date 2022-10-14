@@ -17,7 +17,7 @@ import (
 func handleClaimTokens(w http.ResponseWriter, r *http.Request) {
 	log.Print("Endpoint Hit: ClaimTokens")
 	w.Header().Set("Content-Type", "application/json")
-	enableCors(&w)
+	//enableCors(&w)
 
 	pl := payload.Payload{}
 

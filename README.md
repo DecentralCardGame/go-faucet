@@ -14,4 +14,5 @@ Example `.env`
 SECRET_KEY=key  # The key used to communicate with the hCaptcha server
 RPC_NODE=tcp://127.0.0.1:26657  # Blockchains rpc node
 BLOCKCHAIN_USER=alice  # The users name that send messages to the chain, keys must be present in local keyring
+CHAIN_HOME=""  # The chains home folder, leave empty for default
 ```

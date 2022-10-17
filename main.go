@@ -81,7 +81,7 @@ func handleClaimTokens(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleInternalServerError(w http.ResponseWriter, err error) {
-	http.Error(w, "Internal server error", http.StatusInternalServerError)
+	http.Error(w, "Internal server error: "+err.Error(), http.StatusInternalServerError)
 	log.Printf("Error: %s", err.Error())
 }
 

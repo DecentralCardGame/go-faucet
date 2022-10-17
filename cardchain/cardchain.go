@@ -14,8 +14,14 @@ func SetConfig() {
 }
 
 func getClient() (cosmosclient.Client, error) {
+	chainHome := os.Getenv("CHAIN_HOME")
+	if chainHome == "" {
+		chainHome = "~/.Cardchain"
+	}
+
 	return cosmosclient.New(
 		context.Background(),
+		cosmosclient.WithHome(chainHome),
 		cosmosclient.WithAddressPrefix("cc"),
 		cosmosclient.WithNodeAddress(os.Getenv("RPC_NODE")),
 	)

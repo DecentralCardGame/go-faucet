@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/DecentralCardGame/go-faucet/cardchain"
+	"github.com/DecentralCardGame/go-faucet/cardchain/client"
 	"github.com/DecentralCardGame/go-faucet/payload"
 	"github.com/DecentralCardGame/go-faucet/token"
 	"github.com/joho/godotenv"
@@ -98,10 +99,16 @@ func enableCors(w *http.ResponseWriter) {
 }
 
 func main() {
-	cardchain.SetConfig()
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatalf("Some error occured. Err: %s", err)
 	}
+
+	err = client.Init()
+	if err != nil {
+		log.Fatalf("Some error occured. Err: %s", err)
+	}
+	log.Print("Client instanciated")
+
 	handleRequests()
 }

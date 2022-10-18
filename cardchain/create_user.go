@@ -7,17 +7,17 @@ import (
 	"github.com/ignite-hq/cli/ignite/pkg/cosmosclient"
 )
 
-func CreateUser(creator string, alias string, userAddressString string) (*cosmosclient.Response, error) {
+func CreateUser(creator string, alias string, userAddressString string) (cosmosclient.Response, error) {
 	cosmos := client.Get()
 
 	address, err := cosmos.Address(creator)
 	if err != nil {
-		return nil, err
+		return cosmosclient.Response{}, err
 	}
 
 	userAddr, err := sdktypes.AccAddressFromBech32(userAddressString)
 	if err != nil {
-		return nil, err
+		return cosmosclient.Response{}, err
 	}
 
 	msg := types.NewMsgCreateuser(
@@ -26,5 +26,5 @@ func CreateUser(creator string, alias string, userAddressString string) (*cosmos
 		alias,
 	)
 
-	return broadcastMsg(cosmos, creator, msg)
+	return cosmos.BroadcastTx(creator, msg)
 }

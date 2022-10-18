@@ -2,11 +2,14 @@ package client
 
 import (
 	"context"
+	"log"
 	"os"
 	"sync"
+	"time"
 
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ignite-hq/cli/ignite/pkg/cosmosclient"
+	rpchttp "github.com/tendermint/tendermint/rpc/client/http"
 )
 
 var client *cosmosclient.Client
@@ -15,6 +18,26 @@ var once sync.Once
 func setConfig() {
 	config := sdktypes.GetConfig()
 	config.SetBech32PrefixForAccount("cc", "ccpub")
+}
+
+func WaitForChain() error {
+	rpc, err := rpchttp.New(os.Getenv("RPC_NODE"), "/websocket")
+	if err != nil {
+		return err
+	}
+
+	for {
+		resp, err := rpc.Status(context.Background())
+		if err == nil {
+			log.Printf("Found chain with id: %s", resp.NodeInfo.Network)
+			break
+		}
+
+		log.Print("Waiting for blockchain...")
+		time.Sleep(time.Second)
+	}
+
+	return Init()
 }
 
 func Init() error {

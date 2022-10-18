@@ -104,7 +104,7 @@ func main() {
 		log.Fatalf("Some error occured. Err: %s", err)
 	}
 
-	err = client.Init()
+	err = client.WaitForChain()
 	if err != nil {
 		log.Fatalf("Some error occured. Err: %s", err)
 	}

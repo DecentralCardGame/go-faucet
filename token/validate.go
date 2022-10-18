@@ -6,7 +6,8 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"os"
+
+	"github.com/DecentralCardGame/go-faucet/config"
 )
 
 type captchaResponse struct {
@@ -19,7 +20,7 @@ type captchaResponse struct {
 
 func ValidateToken(token string) (bool, error) {
 	data := url.Values{
-		"secret":   {os.Getenv("SECRET_KEY")},
+		"secret":   {config.Config().SecretKey},
 		"response": {token},
 	}
 

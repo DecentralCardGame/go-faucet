@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"log"
-	"os"
 	"sync"
 	"time"
 
@@ -20,8 +19,8 @@ func setConfig() {
 	config.SetBech32PrefixForAccount("cc", "ccpub")
 }
 
-func WaitForChain() error {
-	rpc, err := rpchttp.New(os.Getenv("RPC_NODE"), "/websocket")
+func WaitForChain(config Config) error {
+	rpc, err := rpchttp.New(config.RPCNode, "/websocket")
 	if err != nil {
 		return err
 	}
@@ -37,22 +36,17 @@ func WaitForChain() error {
 		time.Sleep(time.Second)
 	}
 
-	return Init()
+	return Init(config)
 }
 
-func Init() error {
+func Init(config Config) error {
 	setConfig()
-
-	chainHome := os.Getenv("CHAIN_HOME")
-	if chainHome == "" {
-		chainHome = "~/.Cardchain"
-	}
 
 	localClient, err := cosmosclient.New(
 		context.Background(),
-		cosmosclient.WithHome(chainHome),
+		cosmosclient.WithHome(config.ChainHome),
 		cosmosclient.WithAddressPrefix("cc"),
-		cosmosclient.WithNodeAddress(os.Getenv("RPC_NODE")),
+		cosmosclient.WithNodeAddress(config.RPCNode),
 	)
 
 	once.Do(func() {

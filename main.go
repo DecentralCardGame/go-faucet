@@ -6,10 +6,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/DecentralCardGame/go-faucet/cardchain"
 	"github.com/DecentralCardGame/go-faucet/cardchain/client"
+	"github.com/DecentralCardGame/go-faucet/config"
 	"github.com/DecentralCardGame/go-faucet/payload"
 	"github.com/DecentralCardGame/go-faucet/token"
 	"github.com/joho/godotenv"
@@ -59,7 +59,7 @@ func handleClaimTokens(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cResp, err := cardchain.CreateUser(
-		os.Getenv("BLOCKCHAIN_USER"),
+		config.Config().BlockchainUser,
 		pl.Alias,
 		pl.Address,
 	)
@@ -104,7 +104,12 @@ func main() {
 		log.Fatalf("Some error occured. Err: %s", err)
 	}
 
-	err = client.WaitForChain()
+	err = config.FromEnv()
+	if err != nil {
+		log.Fatalf("Some error occured. Err: %s", err)
+	}
+
+	err = client.WaitForChain(config.Config().ClientConfig())
 	if err != nil {
 		log.Fatalf("Some error occured. Err: %s", err)
 	}

@@ -1,10 +1,12 @@
 package cardchain
 
 import (
+	"context"
+
 	"github.com/DecentralCardGame/Cardchain/x/cardchain/types"
 	"github.com/DecentralCardGame/go-faucet/cardchain/client"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ignite-hq/cli/ignite/pkg/cosmosclient"
+	"github.com/ignite/cli/ignite/pkg/cosmosclient"
 )
 
 func CreateUser(creator string, alias string, userAddressString string) (cosmosclient.Response, error) {
@@ -21,10 +23,15 @@ func CreateUser(creator string, alias string, userAddressString string) (cosmosc
 	}
 
 	msg := types.NewMsgCreateuser(
-		address.String(),
+		address,
 		userAddr.String(),
 		alias,
 	)
 
-	return cosmos.BroadcastTx(creator, msg)
+	account, err := cosmos.Account(creator)
+	if err != nil {
+		return cosmosclient.Response{}, err
+	}
+
+	return cosmos.BroadcastTx(context.Background(), account, msg)
 }

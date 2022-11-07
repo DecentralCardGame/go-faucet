@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/DecentralCardGame/go-faucet/cardchain"
-	"github.com/DecentralCardGame/go-faucet/cardchain/client"
+	"github.com/DecentralCardGame/cardchainClient/cardchain"
+	"github.com/DecentralCardGame/cardchainClient/cardchain/client"
 	"github.com/DecentralCardGame/go-faucet/config"
 	"github.com/DecentralCardGame/go-faucet/payload"
 	"github.com/DecentralCardGame/go-faucet/token"

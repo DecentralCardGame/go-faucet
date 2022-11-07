@@ -5,7 +5,7 @@ import (
 	"os"
 	"sync"
 
-	"github.com/DecentralCardGame/go-faucet/cardchain/client"
+	"github.com/DecentralCardGame/cardchainClient/cardchain/client"
 )
 
 var config *faucetConfig

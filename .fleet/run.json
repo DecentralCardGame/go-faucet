@@ -1,0 +1,10 @@
+{
+    "configurations": [
+        {
+            "type": "go",
+            "name": "",
+            "goExecPath": "go",
+            "buildParams": [],
+        },
+    ]
+}

@@ -3,7 +3,7 @@ package token
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -33,7 +33,7 @@ func ValidateToken(token string) (bool, error) {
 	}
 
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return false, err
 	}
@@ -45,7 +45,7 @@ func ValidateToken(token string) (bool, error) {
 	}
 
 	if len(cResp.ErrorCodes) > 0 {
-		return false, fmt.Errorf("Captcha responded with errors: %s", cResp.ErrorCodes)
+		return false, fmt.Errorf("captcha responded with errors: %s", cResp.ErrorCodes)
 	}
 
 	return cResp.Success, nil

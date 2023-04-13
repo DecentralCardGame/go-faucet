@@ -19,7 +19,7 @@ func (f faucetConfig) verify() error {
 	envs := []string{"CHAIN_HOME", "RPC_NODE", "BLOCKCHAIN_USER", "SECRET_KEY"}
 	for idx, val := range []string{f.ChainHome, f.RPCNode, f.BlockchainUser, f.SecretKey} {
 		if val == "" {
-			return fmt.Errorf("Env var '%s' isn't set properly", envs[idx])
+			return fmt.Errorf("env var '%s' isn't set properly", envs[idx])
 		}
 	}
 	return nil
@@ -27,8 +27,8 @@ func (f faucetConfig) verify() error {
 
 func (f faucetConfig) ClientConfig() client.Config {
 	return client.Config{
-		f.ChainHome,
-		f.RPCNode,
+		ChainHome: f.ChainHome,
+		RPCNode:   f.RPCNode,
 	}
 }
 

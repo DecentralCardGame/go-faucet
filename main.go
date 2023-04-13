@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 
@@ -23,7 +23,7 @@ func handleClaimTokens(w http.ResponseWriter, r *http.Request) {
 	pl := payload.Payload{}
 
 	defer r.Body.Close()
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		handleInternalServerError(w, err)
 		return

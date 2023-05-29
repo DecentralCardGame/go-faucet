@@ -46,7 +46,7 @@ func Init(config Config) error {
 		context.Background(),
 		cosmosclient.WithHome(config.ChainHome),
 		cosmosclient.WithAddressPrefix("cc"),
-		cosmosclient.WithGas("600000"),
+		cosmosclient.WithGas("60000000000000"),
 		cosmosclient.WithNodeAddress(config.RPCNode),
 	)
 

@@ -6,9 +6,9 @@ import (
 	"sync"
 	"time"
 
+	rpchttp "github.com/cometbft/cometbft/rpc/client/http"
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ignite/cli/ignite/pkg/cosmosclient"
-	rpchttp "github.com/tendermint/tendermint/rpc/client/http"
 )
 
 var client *cosmosclient.Client

@@ -3,7 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 
@@ -18,12 +18,12 @@ import (
 func handleClaimTokens(w http.ResponseWriter, r *http.Request) {
 	log.Print("Endpoint Hit: ClaimTokens")
 	w.Header().Set("Content-Type", "application/json")
-	//enableCors(&w)
+	enableCors(&w)
 
 	pl := payload.Payload{}
 
 	defer r.Body.Close()
-	body, err := ioutil.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		handleInternalServerError(w, err)
 		return

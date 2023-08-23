@@ -7,7 +7,7 @@ import (
 	"time"
 
 	sdktypes "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ignite-hq/cli/ignite/pkg/cosmosclient"
+	"github.com/ignite/cli/ignite/pkg/cosmosclient"
 	rpchttp "github.com/tendermint/tendermint/rpc/client/http"
 )
 
@@ -46,6 +46,7 @@ func Init(config Config) error {
 		context.Background(),
 		cosmosclient.WithHome(config.ChainHome),
 		cosmosclient.WithAddressPrefix("cc"),
+		cosmosclient.WithGas("60000000000000"),
 		cosmosclient.WithNodeAddress(config.RPCNode),
 	)
 

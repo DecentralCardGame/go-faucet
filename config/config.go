@@ -39,7 +39,7 @@ func Config() faucetConfig {
 func FromEnv() error {
 	chainHome := os.Getenv("CHAIN_HOME")
 	if chainHome == "" {
-		chainHome = "~/.cardchaind"
+		chainHome = "~/.cardchain"
 	}
 
 	f := faucetConfig{

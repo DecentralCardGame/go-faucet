@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"log/slog"
 	"net/http"
 
 	"github.com/DecentralCardGame/go-faucet/cardchain"
@@ -63,10 +64,13 @@ func handleClaimTokens(w http.ResponseWriter, r *http.Request) {
 		pl.Alias,
 		pl.Address,
 	)
+
 	if err != nil {
 		handleInternalServerError(w, err)
 		return
 	}
+
+	slog.Info("%#v", cResp)
 
 	if cResp.Code != 0 {
 		http.Error(

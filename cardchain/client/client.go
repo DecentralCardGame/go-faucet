@@ -2,7 +2,7 @@ package client
 
 import (
 	"context"
-	"log"
+	"log/slog"
 	"sync"
 	"time"
 
@@ -28,11 +28,11 @@ func WaitForChain(config Config) error {
 	for {
 		resp, err := rpc.Status(context.Background())
 		if err == nil {
-			log.Printf("Found chain with id: %s", resp.NodeInfo.Network)
+			slog.Info("Found chain with id: " + resp.NodeInfo.Network)
 			break
 		}
 
-		log.Print("Waiting for blockchain...")
+		slog.Info("Waiting for blockchain...")
 		time.Sleep(time.Second)
 	}
 

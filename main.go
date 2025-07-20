@@ -17,7 +17,7 @@ import (
 )
 
 func handleClaimTokens(w http.ResponseWriter, r *http.Request) {
-	log.Print("Endpoint Hit: ClaimTokens")
+	slog.Info("Endpoint Hit: ClaimTokens")
 	w.Header().Set("Content-Type", "application/json")
 	enableCors(&w)
 
@@ -70,9 +70,8 @@ func handleClaimTokens(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	slog.Info("%#v", cResp)
-
 	if cResp.Code != 0 {
+		slog.Warn("Transaction failed with: " + cResp.RawLog)
 		http.Error(
 			w,
 			fmt.Sprintf(
@@ -87,13 +86,13 @@ func handleClaimTokens(w http.ResponseWriter, r *http.Request) {
 
 func handleInternalServerError(w http.ResponseWriter, err error) {
 	http.Error(w, "Internal server error: "+err.Error(), http.StatusInternalServerError)
-	log.Printf("Error: %s", err.Error())
+	slog.Error(err.Error())
 }
 
 func handleRequests() {
 	http.HandleFunc("/claimTokens", handleClaimTokens)
-	log.Print("Server running at port 4500")
-	log.Fatal(http.ListenAndServe(":4500", nil))
+	slog.Info("Server running at port 4500")
+	slog.Error(http.ListenAndServe(":4500", nil).Error())
 }
 
 func enableCors(w *http.ResponseWriter) {
@@ -117,7 +116,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Some error occured. Err: %s", err)
 	}
-	log.Print("Client instanciated")
+	slog.Info("Client instanciated")
 
 	handleRequests()
 }
